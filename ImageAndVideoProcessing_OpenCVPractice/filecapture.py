@@ -16,12 +16,24 @@ while True:
         continue
 
     delta_frame = cv2.absdiff(first_frame, gray_frame)  # Compute the absolute difference between the first frame and the current frame
-    #thresh_frame = cv2.threshold(delta_frame, 30, 255, cv2.THRESH_BINARY)[1]  # Apply a binary threshold to the delta frame
-    #thresh_frame = cv2.dilate(thresh_frame, None, iterations=2)
+    thresh_frame = cv2.threshold(delta_frame, 30, 255, cv2.THRESH_BINARY)[1]  # Apply a binary threshold to the delta frame
+    thresh_frame = cv2.dilate(thresh_frame, None, iterations=2)
+
+    (cnts, _) = cv2.findContours(thresh_frame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # Find contours in the threshold frame
+
+    for contour in cnts:
+        if cv2.contourArea(contour) < 1000:  # Ignore small contours
+            continue
+
+        (x, y, w, h) = cv2.boundingRect(contour)  # Get the bounding rectangle for the contour
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)  # Draw a rectangle around the detected motion
 
     #cv2.imshow("Capturing", frame)  # Display the captured frame in a window
     cv2.imshow("Gray Frame", gray_frame)  # Display the captured grayscale frame in a window
     cv2.imshow("Delta Frame", delta_frame)  # Display the delta frame in a window
+    cv2.imshow("Threshold Frame", thresh_frame)  # Display the threshold frame in a window
+    cv2.imshow("Color Frame", frame)  # Display the captured color frame in a window
+
 
     key = cv2.waitKey(1)  # Wait for a key press to close the window
 
