@@ -1,9 +1,10 @@
-import cv2, time
+import cv2, time, pandas
 from datetime import datetime
 
 first_frame = None  # Initialize the first frame variable
 status_list = [None, None]  # Initialize a list to keep track of the status of motion detection
 times = []  # Initialize a list to keep track of the times when motion is detected
+df = pandas.DataFrame(columns=["Start", "End"])  # Create a DataFrame to store the start and end times of motion detection
 
 video = cv2.VideoCapture(0)  # Open the default camera (0)
 
@@ -58,6 +59,13 @@ while True:
         break
 print(status_list)  # Print the list of statuses to the console
 print(times)  # Print the list of times to the console
+
+for i in range(0, len(times), 2):  # Iterate through the times list in steps of 2
+    #df = df.append({"Start": times[i], "End": times[i + 1]}, ignore_index=True)  # Append the start and end times to the DataFrame
+    df.loc[len(df)] = {"Start": times[i], "End": times[i + 1]}
+
+df.to_csv("Times.csv")  # Save the DataFrame to a CSV file
+
 
 video.release()  # Release the camera resource
 cv2.destroyAllWindows()  # Close all windows
